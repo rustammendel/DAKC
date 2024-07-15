@@ -1,47 +1,35 @@
 package com.rlabs.dakc
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.rlabs.dakc.ui.theme.DAKCTheme
 
 class MainActivity : ComponentActivity() {
+    lateinit var dev1: TextView
+    lateinit var dev2: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            DAKCTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "DAkC",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
+        setContentView(R.layout.activity_main)
+        dev1 = findViewById(R.id.dev1)
+        dev1.text = TinymixOut(device = "1")
+
+        dev2 = findViewById(R.id.dev2)
+        dev2.text = TinymixOut(device = "2")
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun TinymixOut(device: String): String {
+    val outPair = runAsRoot(arrayOf("tinymix -D $device"))
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DAKCTheme {
-        Greeting("Android")
-    }
+    val out = outPair.first.toString()
+    val errout = outPair.second.toString()
+
+    val firstLine = if (errout.isNotEmpty()) errout.split("\n")[0] else out.split("\n")[0]
+
+//    Log.d("tinymix", firstLine)
+
+    return "tinymix -D $device out: ${firstLine}!"
+
 }

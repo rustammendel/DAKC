@@ -9,21 +9,6 @@ import java.io.InputStreamReader
 class DakcTileService : TileService() {
 
 
-    // Called when the user adds your tile.
-    override fun onTileAdded() {
-        super.onTileAdded()
-    }
-
-    // Called when your app can update your tile.
-    override fun onStartListening() {
-        super.onStartListening()
-    }
-
-    // Called when your app can no longer update your tile.
-    override fun onStopListening() {
-        super.onStopListening()
-    }
-
     // Called when the user taps on your tile in an active or inactive state.
     override fun onClick() {
         super.onClick()
@@ -31,13 +16,11 @@ class DakcTileService : TileService() {
         runAsRoot(arrayOf("tinymix -D 2 3 120"))
     }
 
-    // Called when the user removes your tile.
-    override fun onTileRemoved() {
-        super.onTileRemoved()
-    }
 }
 
-fun runAsRoot(commands: Array<String>) {
+fun runAsRoot(commands: Array<String>): Pair<StringBuilder, StringBuilder> {
+    val output = StringBuilder()
+    val errorOutput = StringBuilder()
 
     try {
         for (command in commands) {
@@ -47,8 +30,6 @@ fun runAsRoot(commands: Array<String>) {
             // Read the output
             val reader = BufferedReader(InputStreamReader(process.inputStream))
             val errorReader = BufferedReader(InputStreamReader(process.errorStream))
-            val output = StringBuilder()
-            val errorOutput = StringBuilder()
 
             var line: String?
             while (reader.readLine().also { line = it } != null) {
@@ -74,4 +55,5 @@ fun runAsRoot(commands: Array<String>) {
         e.printStackTrace()
     }
 
+    return Pair(output, errorOutput)
 }
