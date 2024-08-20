@@ -11,43 +11,45 @@ class MainActivity : ComponentActivity() {
     lateinit var dev1: TextView
     lateinit var dev2: TextView
     lateinit var dev3: TextView
-    lateinit var button1: Button
+    lateinit var refreshButton: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         dev1 = findViewById(R.id.dev1)
-        dev1.text = TinymixOut(device = "1")
-
         dev2 = findViewById(R.id.dev2)
-        dev2.text = TinymixOut(device = "2")
-
         dev3 = findViewById(R.id.dev3)
-        dev3.text = TinymixOut(device = "2", 7)
 
-
-        button1 = findViewById(R.id.button1)
-        button1.setOnClickListener {
-            dev1.text = TinymixOut(device = "1")
-            dev2.text = TinymixOut(device = "2")
-            dev3.text = TinymixOut(device = "2", 7)
+        fun readFields() {
+            dev1.text = tinymixOut(device = "0")
+            dev2.text = tinymixOut(device = "1")
+            dev3.text = tinymixOut(device = "2")
         }
+        readFields()
+
+        refreshButton = findViewById(R.id.button1)
+        refreshButton.setOnClickListener { readFields() }
 
     }
 
-
 }
 
-fun TinymixOut(device: String, lineNum: Int = 0): String {
-    val outPair = runAsRoot(arrayOf("tinymix -D $device"))
+fun tinymixOut(device: String, lineNum: Int = 0): String {
+    val outPair = runAsRoot(arrayOf("tinymix -D $device | head -20"))
 
     val out = outPair.first.toString()
     val errout = outPair.second.toString()
 
-    val firstLine = if (errout.isNotEmpty()) errout.split("\n")[0] else out.split("\n")[lineNum]
+    val outArr = out.split("\n")
+
+    val firstLine = if (errout.isNotEmpty()) errout.split("\n")[0] else outArr[lineNum]
+    val iVolLine = outArr.indexOfFirst { s -> s.contains("Headset Playback Volume") }
+
+    val volInfo = if (errout.isEmpty() && iVolLine != -1) outArr[iVolLine] else ""
 
     Log.d("tinymix", out)
 
-    return "tinymix -D $device out: \n$firstLine"
+    return "tinymix -D $device out: \n$firstLine \n$volInfo"
 
 }

@@ -12,8 +12,14 @@ class DakcTileService : TileService() {
     // Called when the user taps on your tile in an active or inactive state.
     override fun onClick() {
         super.onClick()
-        Log.d("QS", "Tile tapped")
-        runAsRoot(arrayOf("tinymix -D 2 3 120"))
+        Log.d("Dakc", "Tile tapped")
+        var n = 0
+        var mixerName = ""
+        while (!mixerName.contains("USB-C to 3.5mm") && n < 10) {
+            mixerName = runAsRoot(arrayOf("tinymix -D $n | head")).first.toString().split("\n")[0]
+            n++
+        }
+        runAsRoot(arrayOf("tinymix -D ${n - 1} 3 120"))
     }
 
 }
