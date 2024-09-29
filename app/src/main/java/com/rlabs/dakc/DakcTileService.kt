@@ -2,8 +2,6 @@ package com.rlabs.dakc
 
 import android.service.quicksettings.TileService
 import android.util.Log
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 
 class DakcTileService : TileService() {
@@ -13,53 +11,27 @@ class DakcTileService : TileService() {
     override fun onClick() {
         super.onClick()
         Log.d("Dakc", "Tile tapped")
-        var n = 0
-        var mixerName = ""
-        while (!mixerName.contains("USB-C to 3.5mm") && n < 10) {
-            mixerName = runAsRoot(arrayOf("tinymix -D $n | head")).first.toString().split("\n")[0]
-            n++
-        }
-        runAsRoot(arrayOf("tinymix -D ${n - 1} 3 120"))
+        setVolume()
     }
 
-}
-
-fun runAsRoot(commands: Array<String>): Pair<StringBuilder, StringBuilder> {
-    val output = StringBuilder()
-    val errorOutput = StringBuilder()
-
-    try {
-        for (command in commands) {
-            val processBuilder = ProcessBuilder("su", "-c", command)
-            val process = processBuilder.start()
-
-            // Read the output
-            val reader = BufferedReader(InputStreamReader(process.inputStream))
-            val errorReader = BufferedReader(InputStreamReader(process.errorStream))
-
-            var line: String?
-            while (reader.readLine().also { line = it } != null) {
-                output.append(line).append("\n")
-            }
-            while (errorReader.readLine().also { line = it } != null) {
-                errorOutput.append(line).append("\n")
-            }
-
-            process.waitFor()
-
-            // Log the output
-            if (output.isNotEmpty()) {
-                Log.d("Command Output", output.toString())
-            }
-            if (errorOutput.isNotEmpty()) {
-                Log.e("Command Error", errorOutput.toString())
-            }
-
-
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
+    // Called when the user adds your tile.
+    override fun onTileAdded() {
+        super.onTileAdded()
     }
 
-    return Pair(output, errorOutput)
+    // Called when your app can update your tile.
+    override fun onStartListening() {
+        super.onStartListening()
+    }
+
+    // Called when your app can no longer update your tile.
+    override fun onStopListening() {
+        super.onStopListening()
+    }
+
+    // Called when the user removes your tile.
+    override fun onTileRemoved() {
+        super.onTileRemoved()
+    }
+
 }
